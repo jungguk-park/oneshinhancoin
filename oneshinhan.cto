@@ -1,0 +1,48 @@
+namespace org.one.shinhan.coin
+
+asset Project identified by project_id {
+  o String project_id /* 프로젝트 ID로 unique한 과제를 선정*/
+  o String project_nm
+  --> ProjectIdeaID owner
+  --> ProjectIdeaID winner
+}
+
+enum VotingState {
+  o ON_VOTING
+  o RESERVE_NOT_MET
+  o VOTING_END
+}
+
+asset ProjectListing identified by listing_id {
+  o String listing_id
+  o Double voting_cnt
+  o String description
+  o VotingState state
+  o Vote[] votes optional
+  --> Project project
+}
+
+abstract participant User identified by emp_no_project_id {
+  o String emp_no_project_id /*행번과 프로젝트 ID로 대표직원 지정*/
+  o String title_nm
+  o String jikgub_nm
+  o String name_han
+}
+
+
+participant ProjectIdeaID extends User { /*해당 과제에 대한 프로젝트 아이디어 */
+  o Double voting_card_cnt /*과제에 투표를 받은 CNT합계*/
+  o String[] grp_id_emp_no optional /*해당 프로젝트의 팀원인 직원의 그룹구분 및 직원번호(여러 그룹이 참여할 수 있으므로 그룹명과 직원번호를 조합하여 참여자를 특정한다*/
+}
+
+participant ProjectIssuer extends User { /*과제선정을 결정한 주최자*/
+}
+
+transaction Vote {
+  --> ProjectListing listing
+  --> ProjectIdeaID projectIdeaId
+}
+
+transaction Finish_Voting {
+  --> ProjectListing listing
+}

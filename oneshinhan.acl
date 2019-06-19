@@ -1,0 +1,60 @@
+/**
+ * Access Control List for the voting network.
+ */
+rule ProjectIssuer {
+    description: "프로젝트 발행 인정(임원, 부서장급 이상등)"
+    participant: "org.one.shinhan.coin.ProjectIssuer"
+    operation: ALL
+    resource: "org.one.shinhan.coin.*"
+    action: ALLOW
+}
+
+rule Employee {
+    description: "Allow the employee read access"
+    participant: "org.one.shinhan.coin.ProjectIdeaID"
+    operation: READ
+    resource: "org.one.shinhan.coin.*"
+    action: ALLOW
+}
+
+rule ProjectOwner {
+    description: "Allow the owner of a project total access"
+    participant(m): "org.one.shinhan.coin.ProjectIdeaID"
+    operation: ALL
+    resource(v): "org.one.shinhan.coin.Project"
+    condition: (v.owner.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+
+rule ProjectListingOwner {
+    description: "Allow the owner of a porject total access to their project listing"
+    participant(m): "org.one.shinhan.coin.ProjectIdeaID"
+    operation: ALL
+    resource(v): "org.one.shinhan.coin.ProjectListing"
+    condition: (v.project.owner.getIdentifier() == m.getIdentifier())
+    action: ALLOW
+}
+
+rule SystemACL {
+    description:  "System ACL to permit all access"
+    participant: "org.hyperledger.composer.system.Participant"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
